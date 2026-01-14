@@ -1,53 +1,68 @@
 const cells = document.querySelectorAll(".cell");
 const statusText = document.getElementById("status");
-const resetBtn = document.getElementById("reset");
 
 let currentPlayer = "X";
+let board = Array(9).fill("");
 let gameActive = true;
-let board = ["", "", "", "", "", "", "", "", ""];
 
-const winConditions = [
-  [0,1,2],[3,4,5],[6,7,8],
-  [0,3,6],[1,4,7],[2,5,8],
-  [0,4,8],[2,4,6]
+const winningCombos = [
+  [0,1,2], [3,4,5], [6,7,8],
+  [0,3,6], [1,4,7], [2,5,8],
+  [0,4,8], [2,4,6]
 ];
 
-cells.forEach(cell => {
-  cell.addEventListener("click", () => {
-    const index = cell.getAttribute("data-index");
+// Colors for X and O
+const playerColors = {
+  X: "#ff3c3c", // Red
+  O: "#3c8cff"  // Blue
+};
 
-    if(board[index] !== "" || !gameActive) return;
+cells.forEach(cell => cell.addEventListener("click", handleClick));
 
-    board[index] = currentPlayer;
-    cell.textContent = currentPlayer;
+function handleClick(e) {
+  const index = e.target.dataset.index;
+  if (board[index] !== "" || !gameActive) return;
 
-    checkWinner();
-    currentPlayer = currentPlayer === "X" ? "O" : "X";
-    statusText.textContent = `Player ${currentPlayer}'s Turn`;
-  });
-});
+  board[index] = currentPlayer;
+  e.target.textContent = currentPlayer;
+  e.target.style.color = playerColors[currentPlayer];
+
+  checkWinner();
+}
 
 function checkWinner() {
-  for(let condition of winConditions) {
-    let [a,b,c] = condition;
-
-    if(board[a] && board[a] === board[b] && board[a] === board[c]) {
-      statusText.textContent = `🎉 Player ${board[a]} Wins!`;
+  for (let combo of winningCombos) {
+    const [a,b,c] = combo;
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      statusText.textContent = `🎉 Player ${currentPlayer} Wins! 🎉`;
       gameActive = false;
+
+      cells[a].classList.add("winner");
+      cells[b].classList.add("winner");
+      cells[c].classList.add("winner");
       return;
     }
   }
 
-  if(!board.includes("")) {
-    statusText.textContent = "😐 It's a Draw!";
+  if (!board.includes("")) {
+    statusText.textContent = "🤝 It's a Draw!";
     gameActive = false;
+    return;
   }
+
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+  statusText.textContent = `Player ${currentPlayer}'s turn`;
 }
 
-resetBtn.addEventListener("click", () => {
-  board = ["", "", "", "", "", "", "", "", ""];
-  cells.forEach(cell => cell.textContent = "");
-  currentPlayer = "X";
+function restartGame() {
+  board.fill("");
   gameActive = true;
-  statusText.textContent = "Player X's Turn";
-});
+  currentPlayer = "X";
+  statusText.textContent = "Player X's turn";
+
+  cells.forEach(cell => {
+    cell.textContent = "";
+    cell.style.color = "";
+    cell.classList.remove("winner");
+  });
+}
