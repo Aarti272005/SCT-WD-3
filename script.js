@@ -11,10 +11,9 @@ const winningCombos = [
   [0,4,8], [2,4,6]
 ];
 
-// Colors for X and O
 const playerColors = {
   X: "#ff3c3c", // Red
-  O: "#3c8cff"  // Blue
+  O: "#3c8cff"  //Blue
 };
 
 cells.forEach(cell => cell.addEventListener("click", handleClick));
@@ -66,3 +65,4 @@ function restartGame() {
     cell.classList.remove("winner");
   });
 }
+
